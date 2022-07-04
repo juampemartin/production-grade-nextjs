@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Pane, Dialog, majorScale } from 'evergreen-ui';
 import { useRouter } from 'next/router';
+import { getSession, useSession } from 'next-auth/client';
 import Logo from '../../components/logo';
 import FolderList from '../../components/folderList';
 import NewFolderButton from '../../components/newFolderButton';
@@ -8,6 +9,7 @@ import User from '../../components/user';
 import FolderPane from '../../components/folderPane';
 import DocPane from '../../components/docPane';
 import NewFolderDialog from '../../components/newFolderDialog';
+import { UserSession } from '../../types';
 
 const App: FC<{
   folders?: any[];
@@ -16,7 +18,12 @@ const App: FC<{
   activeDocs?: any[];
 }> = ({ folders, activeDoc, activeFolder, activeDocs }) => {
   const router = useRouter();
+  const [session, loading] = useSession();
   const [newFolderIsShown, setIsShown] = useState(false);
+
+  if (loading) {
+    return null;
+  }
 
   const Page = () => {
     if (activeDoc) {
@@ -30,7 +37,7 @@ const App: FC<{
     return null;
   };
 
-  if (false) {
+  if (!loading && !session) {
     return (
       <Dialog
         isShown
@@ -79,7 +86,7 @@ const App: FC<{
         overflowY="auto"
         position="relative"
       >
-        <User user={{}} />
+        <User user={session.user as UserSession} />
         <Page />
       </Pane>
       <NewFolderDialog
@@ -94,6 +101,15 @@ const App: FC<{
 App.defaultProps = {
   folders: [],
 };
+
+export async function getServerSideProps(ctx) {
+  const session = await getSession(ctx);
+  return {
+    props: {
+      session,
+    },
+  };
+}
 
 /**
  * Catch all handler. Must handle all different page

@@ -3,7 +3,7 @@ import Logo from '../components/logo';
 import { Pane, majorScale, Text } from 'evergreen-ui';
 import { signIn, useSession } from 'next-auth/client';
 import SocialButton from '../components/socialButton';
-import router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 
 const Signin = () => {
   const [session, loading] = useSession();
