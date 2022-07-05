@@ -1,5 +1,6 @@
 import { Db, MongoClient } from 'mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { MDXRemoteSerializeResult } from 'next-mdx-remote';
 
 export interface PostFrontMatter {
   title: string;
@@ -8,7 +9,8 @@ export interface PostFrontMatter {
 }
 
 export interface Post {
-  source: string;
+  source: string,
+  mdxSource: MDXRemoteSerializeResult,
   frontMatter: PostFrontMatter;
 }
 

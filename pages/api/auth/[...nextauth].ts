@@ -1,22 +1,25 @@
 import NextAuth from 'next-auth';
-import Providers from 'next-auth/providers';
+import GitHubProvider from 'next-auth/providers/github';
+import { connectToDB, folder, doc } from '../../../db';
 
 export default (req, res) =>
   NextAuth({
     providers: [
-      Providers.GitHub({
+      GitHubProvider({
         clientId: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
       }),
     ],
-    database: process.env.DATABASE_URL,
     pages: {
-      signIn: '/signin',
+      signIn: '/api/auth/signin',
     },
     session: {
-      jwt: true,
+      strategy: 'jwt',
     },
-    jwt: {
-      secret: process.env.NEXT_AUTH_SECRET,
+    callbacks: {
+      async session({ session, user }) {
+        session.user = user;
+        return session;
+      },
     },
-  });
+  })(req, res);

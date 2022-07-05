@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import Logo from '../components/logo';
 import { Pane, majorScale, Text } from 'evergreen-ui';
-import { signIn, useSession } from 'next-auth/client';
+import { signIn, useSession } from 'next-auth/react';
 import SocialButton from '../components/socialButton';
 import { useRouter } from 'next/router';
 
 const Signin = () => {
-  const [session, loading] = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {

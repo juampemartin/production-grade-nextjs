@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Pane, Dialog, majorScale } from 'evergreen-ui';
 import { useRouter } from 'next/router';
-import { getSession, useSession } from 'next-auth/client';
+import { getSession, useSession } from 'next-auth/react';
 import Logo from '../../components/logo';
 import FolderList from '../../components/folderList';
 import NewFolderButton from '../../components/newFolderButton';
@@ -18,10 +18,10 @@ const App: FC<{
   activeDocs?: any[];
 }> = ({ folders, activeDoc, activeFolder, activeDocs }) => {
   const router = useRouter();
-  const [session, loading] = useSession();
+  const { data: session, status } = useSession();
   const [newFolderIsShown, setIsShown] = useState(false);
 
-  if (loading) {
+  if (status === 'loading') {
     return null;
   }
 
@@ -37,7 +37,7 @@ const App: FC<{
     return null;
   };
 
-  if (!loading && !session) {
+  if (status != 'authenticated' && !session) {
     return (
       <Dialog
         isShown

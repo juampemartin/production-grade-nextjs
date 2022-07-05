@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
-import hydrate from 'next-mdx-remote/hydrate';
+import { MDXRemote } from 'next-mdx-remote';
+import { serialize } from 'next-mdx-remote/serialize';
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
@@ -7,13 +8,12 @@ import { majorScale, Pane, Heading, Spinner } from 'evergreen-ui';
 import { Post } from '../../types';
 import { useRouter } from 'next/router';
 import { posts } from '../../content';
-import renderToString from 'next-mdx-remote/render-to-string';
 import Head from 'next/head';
 import Container from '../../components/container';
 import HomeNav from '../../components/homeNav';
 
-const BlogPost: FC<Post> = ({ source, frontMatter }) => {
-  const content = hydrate(source);
+const BlogPost: FC<Post> = ({ mdxSource, source, frontMatter }) => {
+  const content = serialize(source);
   const router = useRouter();
 
   if (router.isFallback) {
@@ -33,23 +33,25 @@ const BlogPost: FC<Post> = ({ source, frontMatter }) => {
         <HomeNav />
       </header>
       <main>
-        <Container>
-          <Heading
-            fontSize="clamp(2rem, 8vw, 6rem)"
-            lineHeight="clamp(2rem, 8vw, 6rem)"
-            marginY={majorScale(3)}
-          >
-            {frontMatter.title}
-          </Heading>
-          <Pane>{content}</Pane>
-        </Container>
+        <MDXRemote {...mdxSource} >
+          <Container>
+            <Heading
+              fontSize="clamp(2rem, 8vw, 6rem)"
+              lineHeight="clamp(2rem, 8vw, 6rem)"
+              marginY={majorScale(3)}
+            >
+              {frontMatter.title}
+            </Heading>
+            {/* <Pane>{content}</Pane> */}
+          </Container>
+        </MDXRemote>
       </main>
     </Pane>
   );
 };
 
 BlogPost.defaultProps = {
-  source: '',
+  // source: '',
   frontMatter: { title: 'default title', summary: 'summary', publishedOn: '' },
 };
 
@@ -90,7 +92,7 @@ export async function getStaticProps({ params, preview }) {
   }
 
   const { data } = matter(post);
-  const mdxSource = await renderToString(post, { scope: data });
+  const mdxSource = await serialize(post, { scope: data });
 
   return {
     props: {
