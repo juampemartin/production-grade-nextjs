@@ -9,7 +9,7 @@ import {
   majorScale,
   Text,
 } from 'evergreen-ui';
-import { signOut } from 'next-auth/client';
+import { signOut } from 'next-auth/react';
 import { UserSession } from '../types';
 
 const User: FC<{ user: UserSession }> = ({ user }) => {
@@ -29,7 +29,11 @@ const User: FC<{ user: UserSession }> = ({ user }) => {
             </Pane>
             <Pane background="white">
               <Menu>
-                <Menu.Item icon={LogOutIcon} intent="danger" onSelect={signOut}>
+                <Menu.Item
+                  icon={LogOutIcon}
+                  intent="danger"
+                  onSelect={() => signOut()}
+                >
                   Sign out
                 </Menu.Item>
               </Menu>

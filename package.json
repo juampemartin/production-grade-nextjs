@@ -27,6 +27,7 @@
     "@editorjs/simple-image": "^1.4.0",
     "@editorjs/table": "^2.0.2",
     "@editorjs/warning": "^1.2.0",
+    "@next-auth/mongodb-adapter": "^1.0.3",
     "@react-hook/throttle": "^2.2.0",
     "dotenv-safe": "^8.2.0",
     "evergreen-ui": "^6.10.1",

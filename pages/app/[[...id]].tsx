@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Pane, Dialog, majorScale } from 'evergreen-ui';
 import { useRouter } from 'next/router';
 import { getSession, useSession } from 'next-auth/react';
@@ -20,6 +20,13 @@ const App: FC<{
   const router = useRouter();
   const { data: session, status } = useSession();
   const [newFolderIsShown, setIsShown] = useState(false);
+
+  // print out the session inside a useeffect
+  useEffect(() => {
+    if (session) {
+      console.log(session);
+    }
+  }, [session]);
 
   if (status === 'loading') {
     return null;
@@ -76,7 +83,7 @@ const App: FC<{
           <NewFolderButton onClick={() => setIsShown(true)} />
         </Pane>
         <Pane>
-          <FolderList folders={folders} />{' '}
+          <FolderList folders={[{ _id: 1, name: 'hello' }]} />{' '}
         </Pane>
       </Pane>
       <Pane
