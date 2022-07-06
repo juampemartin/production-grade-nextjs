@@ -26,6 +26,9 @@ const User: FC<{ user: UserSession }> = ({ user }) => {
               <Pane>
                 <Text color="muted">{user.email}</Text>
               </Pane>
+              <Pane>
+                <Text color="muted">{user.id}</Text>
+              </Pane>
             </Pane>
             <Pane background="white">
               <Menu>

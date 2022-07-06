@@ -1,15 +1,18 @@
-import jwt from 'next-auth/jwt'
+import { getToken } from 'next-auth/jwt';
 
 export default async (req, res, next) => {
-  const token = await jwt.getToken({ req, secret: process.env.JWT_SECRET })
+  const token = await getToken({
+    req,
+    secret: process.env.JWT_SECRET as string,
+  });
 
   if (token) {
     // Signed in
-    req.user = token
-    next()
+    req.user = token;
+    next();
   } else {
     // Not Signed in
-    res.status(401)
-    res.end()
+    res.status(401);
+    res.end();
   }
-}
+};

@@ -26,7 +26,7 @@ const BlogPost: FC<Post> = ({ mdxSource, source, frontMatter }) => {
   return (
     <Pane>
       <Head>
-        <title>{`Known Blog | ${frontMatter.title}`}</title>
+        <title>{`Casino Blog | ${frontMatter.title}`}</title>
         <meta name="description" content={frontMatter.summary} />
       </Head>
       <header>

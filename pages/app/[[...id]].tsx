@@ -9,7 +9,7 @@ import User from '../../components/user';
 import FolderPane from '../../components/folderPane';
 import DocPane from '../../components/docPane';
 import NewFolderDialog from '../../components/newFolderDialog';
-import { UserSession } from '../../types';
+import { folder, doc, connectToDB } from '../../db';
 
 const App: FC<{
   folders?: any[];
@@ -20,17 +20,20 @@ const App: FC<{
   const router = useRouter();
   const { data: session, status } = useSession();
   const [newFolderIsShown, setIsShown] = useState(false);
+  const [allFolders, setFolders] = useState(folders || []);
 
-  // print out the session inside a useeffect
-  useEffect(() => {
-    if (session) {
-      console.log(session);
-    }
-  }, [session]);
+  const handleNewFolder = async (name: string) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_HOST}/api/folder/`, {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
 
-  if (status === 'loading') {
-    return null;
-  }
+    const { data } = await res.json();
+    setFolders((state) => [...state, data]);
+  };
 
   const Page = () => {
     if (activeDoc) {
@@ -83,7 +86,7 @@ const App: FC<{
           <NewFolderButton onClick={() => setIsShown(true)} />
         </Pane>
         <Pane>
-          <FolderList folders={[{ _id: 1, name: 'hello' }]} />{' '}
+          <FolderList folders={allFolders} />{' '}
         </Pane>
       </Pane>
       <Pane
@@ -93,13 +96,15 @@ const App: FC<{
         overflowY="auto"
         position="relative"
       >
-        <User user={session.user as UserSession} />
-        <Page />
+        <>
+          <User user={session.user} />
+          <Page />
+        </>
       </Pane>
       <NewFolderDialog
         close={() => setIsShown(false)}
         isShown={newFolderIsShown}
-        onNewFolder={() => {}}
+        onNewFolder={handleNewFolder}
       />
     </Pane>
   );
@@ -109,12 +114,34 @@ App.defaultProps = {
   folders: [],
 };
 
-export async function getServerSideProps(ctx) {
-  const session = await getSession(ctx);
+export async function getServerSideProps(context: any) {
+  const session = await getSession(context);
+  // not signed in
+  if (!session || !session.user) {
+    return { props: {} };
+  }
+
+  const props: any = { session };
+  const { db } = await connectToDB();
+  const folders = await folder.getFolders(db, session.user.id);
+  props.folders = folders;
+
+  if (context.params.id) {
+    const activeFolder = folders.find((f) => f._id === context.params.id[0]);
+    const activeDocs = await doc.getDocsByFolder(db, activeFolder._id);
+
+    props.activeFolder = activeFolder;
+    props.activeDocs = activeDocs;
+
+    const activeDocId = context.params.id[1];
+
+    if (activeDocId) {
+      props.activeDoc = await doc.getOneDoc(db, activeDocId);
+    }
+  }
+
   return {
-    props: {
-      session,
-    },
+    props,
   };
 }
 

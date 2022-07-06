@@ -15,7 +15,7 @@ export interface Post {
 }
 
 export interface UserSession {
-  // id: string
+  id: string
   image: string;
   email: string;
   name: string;
